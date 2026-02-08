@@ -56,6 +56,7 @@
 		"fastify-plugin": "^4.0.0",
 		"fastify-tsconfig": "^1.0.1",
 		"fluent-json-schema": "^4.2.1",
+		"husky": "^8.0.0",
 		"fs": "^0.0.1-security",
 		"mime-types": "^3.0.1",
 		"moment": "^2.30.1",
