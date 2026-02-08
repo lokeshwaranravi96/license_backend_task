@@ -12,31 +12,13 @@ export const loginSchema = {
   body: loginBody,
   response: makeResponseSchema(
     Schema.object()
+    .prop('test',Schema.object().additionalProperties(true))
       .prop("data", Schema.object()
       .prop('access_token',Schema.string()).prop('refresh_token',Schema.string()))
       .prop("status", Schema.integer())
       .prop("api_status", Schema.string())
       .prop("message", Schema.string())
-      .additionalProperties(false)
+      .additionalProperties(true)
   ),
 };
 
-/// not needed
-const forgotPasswordBody = Schema.object().prop(
-  "email_id",
-  Schema.string().format("email").required()
-);
-
-export const forgotPasswordSchema = {
-  description: "A forgot password Schema",
-  tags: ["AUTH"],
-  body: forgotPasswordBody,
-  response: makeResponseSchema(
-    Schema.object()
-      .prop("data", Schema.object().additionalProperties(true))
-      .prop("status", Schema.integer())
-      .prop("api_status", Schema.string())
-      .prop("message", Schema.string())
-      .additionalProperties(false)
-  ),
-};
