@@ -1,0 +1,72 @@
+import { Sequelize } from "sequelize";
+import { AutoOptions, SequelizeAuto } from "sequelize-auto";
+import { config } from "dotenv";
+config({ path: ".env" });
+const {
+  DB_NAME,
+  DB_USERNAME,
+  DB_PASSWORD,
+  DB_HOST,
+  DB_PORT,
+  DB_DIALECT,
+  NODE_ENV,
+}: any = process.env;
+
+async function main() {
+  const sequelize = new Sequelize(DB_NAME, DB_USERNAME, DB_PASSWORD, {
+    logging: false,
+    host: DB_HOST,
+    dialect: DB_DIALECT,
+    port: DB_PORT,
+    ...(NODE_ENV === "uat"
+      ? {}
+      : {
+          dialectOptions: {
+            ssl: true,
+          },
+        }),
+  });
+  sequelize
+    .authenticate()
+    .then(() => {
+      console.log("Database connection has been established successfully.");
+    })
+    .catch((err) => {
+      console.error("Unable to connect to the database:", err);
+    });
+
+  const autoOptions: AutoOptions & { dialectOptions?: { ssl: boolean } } = {
+    database: DB_NAME,
+    username: DB_USERNAME,
+    password: DB_PASSWORD,
+    host: DB_HOST,
+    port: DB_PORT,
+    dialect: DB_DIALECT,
+    ...(process.env.NODE_ENV === "uat"
+      ? {}
+      : {
+          dialectOptions: {
+            ssl: true,
+          },
+        }),
+    directory: "./src/models",
+    additional: {
+      timestamps: false,
+    },
+    noAlias: false,
+    singularize: true,
+    useDefine: false,
+    lang: "ts",
+    skipTables: ["_prisma_migrations", "knex_migration"],
+    schema: "public",
+  };
+  const auto = new SequelizeAuto(
+    DB_NAME,
+    DB_USERNAME,
+    DB_PASSWORD,
+    autoOptions
+  );
+  await auto.run();
+}
+
+main();

@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model master_status {
+  id                    Int                     @id @default(autoincrement())
+  name                  String?                 @db.VarChar
+  is_active             Boolean?
+  licenses              licenses[]
+  master_payment_status master_payment_status[]
+  order_items           order_items[]
+  orders                orders[]
+  payments              payments[]
+  users                 users[]
+}
+
+model licenses {
+  id                               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                             String?        @db.VarChar
+  monthly_price                    Decimal?       @db.Decimal
+  status_id                        Int?
+  created_at                       DateTime?      @db.Timestamp(6)
+  updated_at                       DateTime?      @db.Timestamp(6)
+  created_by                       String?        @db.Uuid
+  updated_by                       String?        @db.Uuid
+  users_licenses_created_byTousers users?         @relation("licenses_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  master_status                    master_status? @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_licenses_updated_byTousers users?         @relation("licenses_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  order_items                      order_items[]
+}
+
+model master_payment_status {
+  id            Int            @id @default(autoincrement())
+  name          String?        @db.VarChar
+  status_id     Int?
+  master_status master_status? @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orders        orders[]
+  payments      payments[]
+}
+
+model order_items {
+  id                                  String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id                             String?        @db.Uuid
+  order_id                            String?        @db.Uuid
+  license_id                          String?        @db.Uuid
+  quantity                            Int
+  amount_per_qty                      Int?
+  amount_total_qty                    Int?
+  purchase_date                       DateTime       @db.Date
+  start_date                          DateTime       @db.Date
+  expiry_date                         DateTime       @db.Date
+  status_id                           Int?
+  created_at                          DateTime?      @db.Timestamp(6)
+  updated_at                          DateTime?      @db.Timestamp(6)
+  created_by                          String?        @db.Uuid
+  updated_by                          String?        @db.Uuid
+  users_order_items_created_byTousers users?         @relation("order_items_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  licenses                            licenses?      @relation(fields: [license_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orders                              orders?        @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  master_status                       master_status? @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_order_items_updated_byTousers users?         @relation("order_items_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_order_items_user_idTousers    users?         @relation("order_items_user_idTousers", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model orders {
+  id                             String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id                        String?                @db.Uuid
+  invoice_no                     String?                @db.VarChar
+  invoice_date                   DateTime?              @db.Timestamp(6)
+  total_amount                   Int?
+  payment_status_id              Int?
+  status_id                      Int?
+  created_at                     DateTime?              @db.Timestamp(6)
+  updated_at                     DateTime?              @db.Timestamp(6)
+  created_by                     String?                @db.Uuid
+  updated_by                     String?                @db.Uuid
+  order_items                    order_items[]
+  users_orders_created_byTousers users?                 @relation("orders_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  master_payment_status          master_payment_status? @relation(fields: [payment_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  master_status                  master_status?         @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_orders_updated_byTousers users?                 @relation("orders_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_orders_user_idTousers    users?                 @relation("orders_user_idTousers", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payments                       payments[]
+}
+
+model payments {
+  id                               String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id                         String?                @db.Uuid
+  amount                           Decimal?               @db.Decimal
+  payment_method                   String?                @db.VarChar
+  payment_status_id                Int?
+  paid_at                          DateTime?              @db.Timestamp(6)
+  status_id                        Int?
+  created_at                       DateTime?              @db.Timestamp(6)
+  updated_at                       DateTime?              @db.Timestamp(6)
+  created_by                       String?                @db.Uuid
+  updated_by                       String?                @db.Uuid
+  users_payments_created_byTousers users?                 @relation("payments_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orders                           orders?                @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  master_payment_status            master_payment_status? @relation(fields: [payment_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  master_status                    master_status?         @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_payments_updated_byTousers users?                 @relation("payments_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  id                                        String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                                      String?        @db.VarChar
+  email                                     String?        @db.VarChar
+  password_hash                             String?        @db.VarChar
+  status_id                                 Int?
+  created_at                                DateTime?      @db.Timestamp(6)
+  updated_at                                DateTime?      @db.Timestamp(6)
+  created_by                                String?        @db.Uuid
+  updated_by                                String?        @db.Uuid
+  licenses_licenses_created_byTousers       licenses[]     @relation("licenses_created_byTousers")
+  licenses_licenses_updated_byTousers       licenses[]     @relation("licenses_updated_byTousers")
+  order_items_order_items_created_byTousers order_items[]  @relation("order_items_created_byTousers")
+  order_items_order_items_updated_byTousers order_items[]  @relation("order_items_updated_byTousers")
+  order_items_order_items_user_idTousers    order_items[]  @relation("order_items_user_idTousers")
+  orders_orders_created_byTousers           orders[]       @relation("orders_created_byTousers")
+  orders_orders_updated_byTousers           orders[]       @relation("orders_updated_byTousers")
+  orders_orders_user_idTousers              orders[]       @relation("orders_user_idTousers")
+  payments_payments_created_byTousers       payments[]     @relation("payments_created_byTousers")
+  payments_payments_updated_byTousers       payments[]     @relation("payments_updated_byTousers")
+  master_status                             master_status? @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}

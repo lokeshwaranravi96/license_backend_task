@@ -1,0 +1,4 @@
+GET  /api/v1/licenses/list?offset=0&limit=10 HTTP/1.1
+Host: localhost:3000
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTNmZjE5NDgtNzkyNy00ZjAwLTlkZDItYTZmZTE5MGNlMjkyIiwiaWF0IjoxNzcwNTE3NTQ5LCJleHAiOjE3NzA2MDM5NDl9.k1hKYTlO5YZklcvO-QuAKGOJ9ACUoKL_ntX4KYv0nfg
