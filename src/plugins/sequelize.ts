@@ -31,13 +31,6 @@ const sequelizePlugin: FastifyPluginCallback<SequelizeOptions> = async (
     host: DB_HOST,
     dialect: DB_DIALECT,
     port: DB_PORT,
-    ...(process.env.NODE_ENV === "uat"
-      ? {}
-      : {
-          dialectOptions: {
-            ssl: true,
-          },
-        }),
   });
   sequelize
     .authenticate()

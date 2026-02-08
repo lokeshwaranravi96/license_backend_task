@@ -9,7 +9,6 @@ const {
   DB_HOST,
   DB_PORT,
   DB_DIALECT,
-  NODE_ENV,
 }: any = process.env;
 
 async function main() {
@@ -18,13 +17,6 @@ async function main() {
     host: DB_HOST,
     dialect: DB_DIALECT,
     port: DB_PORT,
-    ...(NODE_ENV === "uat"
-      ? {}
-      : {
-          dialectOptions: {
-            ssl: true,
-          },
-        }),
   });
   sequelize
     .authenticate()
@@ -42,13 +34,6 @@ async function main() {
     host: DB_HOST,
     port: DB_PORT,
     dialect: DB_DIALECT,
-    ...(process.env.NODE_ENV === "uat"
-      ? {}
-      : {
-          dialectOptions: {
-            ssl: true,
-          },
-        }),
     directory: "./src/models",
     additional: {
       timestamps: false,
