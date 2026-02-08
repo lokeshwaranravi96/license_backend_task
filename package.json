@@ -11,7 +11,7 @@
 		"seed": "ts-node prisma/seeders/index.ts"
 	},
 	"scripts": {
-		"local": "nodemon --watch src -e ts,json --exec \"rm -rf dist && tsc --project tsconfig.json && tsc-alias && fastify start -a 0.0.0.0 -l info dist/app.js\"",
+		"local": "nodemon --watch src -e ts,json --exec \"rimraf dist && tsc --project tsconfig.json && tsc-alias && fastify start -a 0.0.0.0 -l info dist/app.js\"",
 		"test": "npm run build:ts && tsc -p test/tsconfig.json && tap --ts \"test/**/*.test.ts\"",
 		"start": "fastify start -a 0.0.0.0 -l info dist/app.js",
 		"build:ts": "npm install && rm -rf dist && tsc --project tsconfig.json && tsc-alias",
@@ -34,7 +34,6 @@
 	"author": "ray",
 	"license": "ISC",
 	"dependencies": {
-		
 		"@fastify/autoload": "^5.0.0",
 		"@fastify/cors": "^8.2.0",
 		"@fastify/env": "^4.2.0",
@@ -56,14 +55,15 @@
 		"fastify-plugin": "^4.0.0",
 		"fastify-tsconfig": "^1.0.1",
 		"fluent-json-schema": "^4.2.1",
-		"husky": "^8.0.0",
 		"fs": "^0.0.1-security",
+		"husky": "^8.0.0",
 		"mime-types": "^3.0.1",
 		"moment": "^2.30.1",
 		"node-cron": "^3.0.3",
 		"path": "^0.12.7",
 		"pg": "^8.16.3",
 		"prisma": "^4.12.0",
+		"rimraf": "^6.1.2",
 		"sequelize": "^6.29.0",
 		"stream-to-buffer": "^0.1.0",
 		"ts-node": "^10.4.0",

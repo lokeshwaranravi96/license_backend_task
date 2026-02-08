@@ -27,13 +27,24 @@ async function main() {
       console.error("Unable to connect to the database:", err);
     });
 
-  const autoOptions: AutoOptions & { dialectOptions?: { ssl: boolean } } = {
+  const autoOptions: AutoOptions & { dialectOptions?: { ssl: {require:boolean;rejectUnauthorized:boolean} } } = {
     database: DB_NAME,
     username: DB_USERNAME,
     password: DB_PASSWORD,
     host: DB_HOST,
     port: DB_PORT,
     dialect: DB_DIALECT,
+   ...(process.env.NODE_ENV === "local"
+      ? {}
+      : 
+      {
+          dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
+    }),
     directory: "./src/models",
     additional: {
       timestamps: false,

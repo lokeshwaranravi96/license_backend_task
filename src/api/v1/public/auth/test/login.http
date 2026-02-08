@@ -6,3 +6,13 @@ Content-Type: application/json
     "email_id": "lokeshwaranravi96@gmail.com",
     "password": "123456789"
 }
+
+####
+POST /api/v1/auth/login HTTP/1.1
+Host: license-backend-task.onrender.com
+Content-Type: application/json
+
+{
+  "email_id": "lokeshwaranravi96@gmail.com",
+  "password": "123456789"
+}
