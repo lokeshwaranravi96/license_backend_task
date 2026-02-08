@@ -7,6 +7,7 @@ CREATE TABLE "users" (
   "email" varchar,
   "password_hash" varchar,
   "status_id" integer default 1,
+  "refresh_token" text,
   "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "created_by" uuid,

@@ -21,7 +21,25 @@ class UsersServices {
     });
   }
 
+static update(options: Partial<userAttributes>,id:string): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      try {
+     
 
+       let result= await user.update(options,{
+          where: {
+            id
+          }
+        })
+        
+
+  return  resolve(result)
+      } catch (error: any) {
+        console.error("Error in UsersService.update:", error);
+       return reject(error.message);
+      }
+    });
+  }
   
 }
 

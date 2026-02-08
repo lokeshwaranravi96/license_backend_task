@@ -13,19 +13,19 @@ export interface order_itemAttributes {
   quantity: number;
   amount_per_qty?: number;
   amount_total_qty?: number;
-  purchase_date: string;
+  purchase_date: Date;
   start_date: string;
   expiry_date: string;
   status_id?: number;
-  created_at?: Date;
-  updated_at?: Date;
+  created_at: Date;
+  updated_at: Date;
   created_by?: string;
   updated_by?: string;
 }
 
 export type order_itemPk = "id";
 export type order_itemId = order_item[order_itemPk];
-export type order_itemOptionalAttributes = "id" | "user_id" | "order_id" | "license_id" | "amount_per_qty" | "amount_total_qty" | "status_id" | "created_at" | "updated_at" | "created_by" | "updated_by";
+export type order_itemOptionalAttributes = "id" | "user_id" | "order_id" | "license_id" | "amount_per_qty" | "amount_total_qty" | "purchase_date" | "status_id" | "created_at" | "updated_at" | "created_by" | "updated_by";
 export type order_itemCreationAttributes = Optional<order_itemAttributes, order_itemOptionalAttributes>;
 
 export class order_item extends Model<order_itemAttributes, order_itemCreationAttributes> implements order_itemAttributes {
@@ -36,12 +36,12 @@ export class order_item extends Model<order_itemAttributes, order_itemCreationAt
   quantity!: number;
   amount_per_qty?: number;
   amount_total_qty?: number;
-  purchase_date!: string;
+  purchase_date!: Date;
   start_date!: string;
   expiry_date!: string;
   status_id?: number;
-  created_at?: Date;
-  updated_at?: Date;
+  created_at!: Date;
+  updated_at!: Date;
   created_by?: string;
   updated_by?: string;
 
@@ -121,8 +121,9 @@ export class order_item extends Model<order_itemAttributes, order_itemCreationAt
       allowNull: true
     },
     purchase_date: {
-      type: DataTypes.DATEONLY,
-      allowNull: false
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.fn('now')
     },
     start_date: {
       type: DataTypes.DATEONLY,
@@ -135,6 +136,7 @@ export class order_item extends Model<order_itemAttributes, order_itemCreationAt
     status_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
+      defaultValue: 1,
       references: {
         model: 'master_status',
         key: 'id'
@@ -142,11 +144,13 @@ export class order_item extends Model<order_itemAttributes, order_itemCreationAt
     },
     created_at: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
     },
     updated_at: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
     },
     created_by: {
       type: DataTypes.UUID,

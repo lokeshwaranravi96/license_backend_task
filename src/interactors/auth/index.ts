@@ -27,6 +27,10 @@ const refresh_token = request.server.jwt.sign({
           user_id: result?.id,
         },{expiresIn: '7d'});
 
+        await UsersServices.update({
+         refresh_token,
+      }, result?.id);
+
       return resolve({ ...result, access_token:token,refresh_token:refresh_token });
     } catch (error: any) {
       return reject(error);

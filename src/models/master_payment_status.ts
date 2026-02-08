@@ -66,6 +66,7 @@ export class master_payment_status extends Model<master_payment_statusAttributes
     status_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
+      defaultValue: 1,
       references: {
         model: 'master_status',
         key: 'id'

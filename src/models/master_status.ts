@@ -111,7 +111,8 @@ export class master_status extends Model<master_statusAttributes, master_statusC
     },
     is_active: {
       type: DataTypes.BOOLEAN,
-      allowNull: true
+      allowNull: true,
+      defaultValue: true
     }
   }, {
     sequelize,

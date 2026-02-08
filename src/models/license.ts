@@ -9,8 +9,8 @@ export interface licenseAttributes {
   name?: string;
   monthly_price?: number;
   status_id?: number;
-  created_at?: Date;
-  updated_at?: Date;
+  created_at: Date;
+  updated_at: Date;
   created_by?: string;
   updated_by?: string;
 }
@@ -25,8 +25,8 @@ export class license extends Model<licenseAttributes, licenseCreationAttributes>
   name?: string;
   monthly_price?: number;
   status_id?: number;
-  created_at?: Date;
-  updated_at?: Date;
+  created_at!: Date;
+  updated_at!: Date;
   created_by?: string;
   updated_by?: string;
 
@@ -77,6 +77,7 @@ export class license extends Model<licenseAttributes, licenseCreationAttributes>
     status_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
+      defaultValue: 1,
       references: {
         model: 'master_status',
         key: 'id'
@@ -84,11 +85,13 @@ export class license extends Model<licenseAttributes, licenseCreationAttributes>
     },
     created_at: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
     },
     updated_at: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
     },
     created_by: {
       type: DataTypes.UUID,

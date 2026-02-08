@@ -12,15 +12,16 @@ export interface userAttributes {
   email?: string;
   password_hash?: string;
   status_id?: number;
-  created_at?: Date;
-  updated_at?: Date;
+  refresh_token?: string;
+  created_at: Date;
+  updated_at: Date;
   created_by?: string;
   updated_by?: string;
 }
 
 export type userPk = "id";
 export type userId = user[userPk];
-export type userOptionalAttributes = "id" | "name" | "email" | "password_hash" | "status_id" | "created_at" | "updated_at" | "created_by" | "updated_by";
+export type userOptionalAttributes = "id" | "name" | "email" | "password_hash" | "status_id" | "refresh_token" | "created_at" | "updated_at" | "created_by" | "updated_by";
 export type userCreationAttributes = Optional<userAttributes, userOptionalAttributes>;
 
 export class user extends Model<userAttributes, userCreationAttributes> implements userAttributes {
@@ -29,8 +30,9 @@ export class user extends Model<userAttributes, userCreationAttributes> implemen
   email?: string;
   password_hash?: string;
   status_id?: number;
-  created_at?: Date;
-  updated_at?: Date;
+  refresh_token?: string;
+  created_at!: Date;
+  updated_at!: Date;
   created_by?: string;
   updated_by?: string;
 
@@ -183,18 +185,25 @@ export class user extends Model<userAttributes, userCreationAttributes> implemen
     status_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
+      defaultValue: 1,
       references: {
         model: 'master_status',
         key: 'id'
       }
     },
+    refresh_token: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
     created_at: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
     },
     updated_at: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
     },
     created_by: {
       type: DataTypes.UUID,
