@@ -11,10 +11,10 @@
 		"seed": "ts-node prisma/seeders/index.ts"
 	},
 	"scripts": {
-		"local": "nodemon --watch src -e ts,json --exec \"rimraf dist && tsc --project tsconfig.json && tsc-alias && fastify start -a 0.0.0.0 -l info dist/app.js\"",
+		"local": "nodemon --watch src -e ts,json --exec \"rm -rf dist && tsc --project tsconfig.json && tsc-alias && fastify start -a 0.0.0.0 -l info dist/app.js\"",
 		"test": "npm run build:ts && tsc -p test/tsconfig.json && tap --ts \"test/**/*.test.ts\"",
 		"start": "fastify start -a 0.0.0.0 -l info dist/app.js",
-		"build:ts": "rimraf dist && tsc --project tsconfig.json && tsc-alias",
+		"build:ts": "rm -rf dist && tsc --project tsconfig.json && tsc-alias",
 		"watch:ts": "tsc -w",
 		"dev": "nodemon --watch src -e ts,json --exec \"npm run build:ts && fastify start -a 0.0.0.0 -l info dist/app.js\"",
 		"dev:start": "fastify start -a 0.0.0.0 --ignore-watch=.ts$ -w -l info -P dist/app.js",
@@ -91,7 +91,6 @@
 		"fastify-tsconfig": "^1.0.1",
 		"nodemon": "^3.0.2",
 		"pretty-quick": "^3.1.3",
-		"rimraf": "^6.1.2",
 		"sequelize-auto": "^0.8.8",
 		"tap": "^16.1.0"
 	}
