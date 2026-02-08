@@ -17,6 +17,13 @@ const orders = async (fastify: FastifyInstance, _opts: any, done: any) => {
     handler.ORDER_LIST_DETAILS
   );
 
+  
+  fastify.get(
+    "/active",
+    { schema: schema.getActiveRecordSchema },
+    handler.GET_ACTIVE_RECORD
+  );
+  
   done();
 };
 

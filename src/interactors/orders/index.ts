@@ -27,8 +27,10 @@ const calculateProratedAmount = (
   const perDayCharge = requestedAmount / originalCycleDays;
 
   // Calculate prorated amount
-  const proratedAmount = Math.ceil(perDayCharge * remainingDays);
+  const proratedAmount =
+  Number((perDayCharge * remainingDays).toFixed(2)) || 0;
 
+  console.log('proratedAmount:==>', proratedAmount)
   return { proratedAmount, remainingDays, perDayCharge };
 };
 
@@ -86,6 +88,7 @@ export const orderCreate = (options: OrderCreatePayload): Promise<any> => {
           invoice_no: `INV-${count + 1}`,
           invoice_date: new Date(),
           total_amount: user_pay,
+          // total_amount: Number(user_pay)?.toFixed(2)||0,
           payment_status_id: 1, // Assuming 1 is the default payment status (e.g., pending)
           user_id: options.user_id,
           status_id: 1,
@@ -157,6 +160,44 @@ export const listAllOrderDetails = (options: CommonGetOptions): Promise<any> => 
       const result = await OrdersServices.findAll(options);
     
       return resolve(result);
+    } catch (error: any) {
+      return reject(error);
+    }
+  });
+};
+
+
+
+export const getActiveRecord = (user_id:string): Promise<any> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+ 
+    
+        const previousOrder = await OrdersServices.findOne(
+        {
+          user_id: user_id,
+          status_id: 1,
+        }
+      );
+
+      const prevItem = previousOrder?.order_items?.[0];
+      const prevStart = prevItem?.start_date;
+      const prevExpiry = prevItem?.expiry_date;
+     
+      let totalRecords= await OrdersServices.count()
+      // 3️⃣ Parent-level validation
+      if (previousOrder) {
+      
+       const expiry = moment(prevExpiry).startOf("day");
+       const remainingDays = expiry.diff(prevStart, "days") + 1;
+
+       console.log('remainingDays:', remainingDays)
+       return resolve({remainingDays, expiry: prevExpiry,totalRecords})
+        // proratedAmount, remainingDays, perDayCharge 
+      }
+
+
+      return resolve({remainingDays:0,expiry:0,totalRecords});
     } catch (error: any) {
       return reject(error);
     }

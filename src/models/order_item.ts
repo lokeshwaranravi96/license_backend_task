@@ -113,11 +113,11 @@ export class order_item extends Model<order_itemAttributes, order_itemCreationAt
       allowNull: false
     },
     amount_per_qty: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DECIMAL,
       allowNull: true
     },
     amount_total_qty: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DECIMAL,
       allowNull: true
     },
     purchase_date: {

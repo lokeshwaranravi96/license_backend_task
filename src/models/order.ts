@@ -113,7 +113,7 @@ export class order extends Model<orderAttributes, orderCreationAttributes> imple
       allowNull: true
     },
     total_amount: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DECIMAL,
       allowNull: true
     },
     payment_status_id: {

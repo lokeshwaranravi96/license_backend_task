@@ -1,4 +1,5 @@
 import { CommonGetOptions } from "@types";
+import { license } from "models/license";
 import { master_payment_status } from "models/master_payment_status";
 import { order, orderAttributes } from "models/order";
 import { order_item } from "models/order_item";
@@ -95,6 +96,18 @@ class OrdersServices {
                   status_id: 1,
                   
               },
+              include: [  
+          {
+              model: license,
+              required: false,
+              attributes:["id","name","monthly_price"],
+              as: "license",
+              where: {
+                  status_id: 1,
+              },
+            }
+          ]
+
             },
           {
               model: master_payment_status,
