@@ -17,6 +17,17 @@ async function main() {
     host: DB_HOST,
     dialect: DB_DIALECT,
     port: DB_PORT,
+    ...(process.env.NODE_ENV === "local"
+      ? {}
+      : 
+      {
+          dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
+    }),
   });
   sequelize
     .authenticate()

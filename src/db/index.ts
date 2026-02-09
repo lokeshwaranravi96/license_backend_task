@@ -37,7 +37,19 @@ let sequelizeQuery = new Sequelize(
     host: dbOptions.host,
     dialect: dbOptions.dialect as Dialect,
     port: dbOptions.port,
-  }
+     ...(process.env.NODE_ENV === "local"
+      ? {}
+      : 
+      {
+          dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
+    }),
+  },
+  
 );
 
 export const getSequelizeConnection = (config?: any): Sequelize => {
@@ -49,12 +61,17 @@ export const getSequelizeConnection = (config?: any): Sequelize => {
       port: Number(config?.DB_PORT!),
       host: config?.DB_HOST!,
       dialect: config?.DB_DIALECT!,
-      dialectOptions: {
-        ssl: {
-          require: true,
-          rejectUnauthorized: false, // Allow self-signed certificates if needed
-        },
-      },
+       ...(process.env.NODE_ENV === "local"
+      ? {}
+      : 
+      {
+          dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
+    }),
     };
   }
   return sequelizeQuery;
