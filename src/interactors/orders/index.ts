@@ -3,7 +3,10 @@ import { OrderitemsServices } from "services/order_items";
 import { OrdersServices } from "services/orders";
 import moment = require("moment");
 import { CommonGetOptions, OrderCreatePayload } from "@types";
-
+import { RESPONSE_MESSAGES } from "@helpers";
+import * as ejs from "ejs";
+import * as path from "path";
+import * as appRoot from "app-root-path";
 
 /**
  * Calculate prorated amount based on remaining days until expiry
@@ -27,10 +30,9 @@ const calculateProratedAmount = (
   const perDayCharge = requestedAmount / originalCycleDays;
 
   // Calculate prorated amount
-  const proratedAmount =
-  Number((perDayCharge * remainingDays).toFixed(2)) || 0;
+  const proratedAmount = Number((perDayCharge * remainingDays).toFixed(2)) || 0;
 
-  console.log('proratedAmount:==>', proratedAmount)
+  console.log("proratedAmount:==>", proratedAmount);
   return { proratedAmount, remainingDays, perDayCharge };
 };
 
@@ -41,12 +43,10 @@ export const orderCreate = (options: OrderCreatePayload): Promise<any> => {
 
     try {
       // 1️⃣ Get previous active order
-      const previousOrder = await OrdersServices.findOne(
-        {
-          user_id: options.user_id,
-          status_id: 1,
-        }
-      );
+      const previousOrder = await OrdersServices.findOne({
+        user_id: options.user_id,
+        status_id: 1,
+      });
 
       const prevItem = previousOrder?.order_items?.[0];
       const prevStart = prevItem?.start_date;
@@ -81,7 +81,7 @@ export const orderCreate = (options: OrderCreatePayload): Promise<any> => {
         }
       }
 
-      let count= await OrdersServices.count()
+      let count = await OrdersServices.count();
       // 4️⃣ Create order
       const order = await OrdersServices.create(
         {
@@ -98,7 +98,7 @@ export const orderCreate = (options: OrderCreatePayload): Promise<any> => {
       );
 
       // 5️⃣ Prepare order items (SYNC map)
-      const orderItemsData = options.order_items.map((item:any) => {
+      const orderItemsData = options.order_items.map((item: any) => {
         const amountPerQty = item.amount_per_unit || 0;
 
         const prorated = calculateProratedAmount(
@@ -109,18 +109,17 @@ export const orderCreate = (options: OrderCreatePayload): Promise<any> => {
 
         /// if prorated amount is greater than amount per qty then reject the request
         if (prorated.proratedAmount > amountPerQty) {
-
-           return reject({
-             data: {
-               expected: prorated.proratedAmount,
-               actual: amountPerQty},
-               ...globalThis.status_codes.bad_request,
-             message: "Item amount mismatch",
+          return reject({
+            data: {
+              expected: prorated.proratedAmount,
+              actual: amountPerQty,
+            },
+            ...globalThis.status_codes.bad_request,
+            message: "Item amount mismatch",
           });
-          
         }
 
-        console.log('order:', order)
+        console.log("order:", order);
         return {
           ...item,
           amount_per_qty: amountPerQty,
@@ -142,7 +141,7 @@ export const orderCreate = (options: OrderCreatePayload): Promise<any> => {
       await transaction.commit();
 
       return resolve({
-          order,
+        order,
       });
     } catch (error) {
       await transaction.rollback();
@@ -151,14 +150,13 @@ export const orderCreate = (options: OrderCreatePayload): Promise<any> => {
   });
 };
 
-
-
-
-export const listAllOrderDetails = (options: CommonGetOptions): Promise<any> => {
+export const listAllOrderDetails = (
+  options: CommonGetOptions
+): Promise<any> => {
   return new Promise(async (resolve, reject) => {
     try {
       const result = await OrdersServices.findAll(options);
-    
+
       return resolve(result);
     } catch (error: any) {
       return reject(error);
@@ -166,38 +164,61 @@ export const listAllOrderDetails = (options: CommonGetOptions): Promise<any> => 
   });
 };
 
-
-
-export const getActiveRecord = (user_id:string): Promise<any> => {
+export const getActiveRecord = (user_id: string): Promise<any> => {
   return new Promise(async (resolve, reject) => {
     try {
- 
-    
-        const previousOrder = await OrdersServices.findOne(
-        {
-          user_id: user_id,
-          status_id: 1,
-        }
-      );
+      const previousOrder = await OrdersServices.findOne({
+        user_id: user_id,
+        status_id: 1,
+      });
 
       const prevItem = previousOrder?.order_items?.[0];
       const prevStart = prevItem?.start_date;
       const prevExpiry = prevItem?.expiry_date;
-     
-      let totalRecords= await OrdersServices.count()
+
+      let totalRecords = await OrdersServices.count();
       // 3️⃣ Parent-level validation
       if (previousOrder) {
-      
-       const expiry = moment(prevExpiry).startOf("day");
-       const remainingDays = expiry.diff(prevStart, "days") + 1;
+        const expiry = moment(prevExpiry).startOf("day");
+        const remainingDays = expiry.diff(prevStart, "days") + 1;
 
-       console.log('remainingDays:', remainingDays)
-       return resolve({remainingDays, expiry: prevExpiry,totalRecords})
-        // proratedAmount, remainingDays, perDayCharge 
+        console.log("remainingDays:", remainingDays);
+        return resolve({ remainingDays, expiry: prevExpiry, totalRecords });
+        // proratedAmount, remainingDays, perDayCharge
       }
 
+      return resolve({ remainingDays: 0, expiry: 0, totalRecords });
+    } catch (error: any) {
+      return reject(error);
+    }
+  });
+};
 
-      return resolve({remainingDays:0,expiry:0,totalRecords});
+export const getInvoiceDetails = (id: string): Promise<any> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const orderDetails = await OrdersServices.findAll({
+        offset: 0,
+        limit: 1,
+        id,
+      });
+
+      if (!orderDetails[0]) {
+        return reject({
+          ...globalThis.status_codes.bad_request,
+          message: RESPONSE_MESSAGES.BAD_REQUEST,
+        });
+      }
+
+      // Render EJS → HTML
+      const html = await ejs.renderFile(
+        path.join(appRoot.path, "src/template/invoice.ejs"),
+        { invoice: orderDetails[0] }
+      );
+
+      const base64 = Buffer.from(html, "utf-8").toString("base64");
+
+      return resolve(base64);
     } catch (error: any) {
       return reject(error);
     }

@@ -1,0 +1,4 @@
+GET  /api/v1/orders/download?id=f038f4e4-b5c8-496d-a775-a97124391774 HTTP/1.1
+Host: localhost:3000
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTNmZjE5NDgtNzkyNy00ZjAwLTlkZDItYTZmZTE5MGNlMjkyIiwiaWF0IjoxNzcwNzI5NzQ0LCJleHAiOjE3NzA4MTYxNDR9.JosRHOS6E4XWWlDWi6QilYppjxj9hp7kZv8Rc07YTRk

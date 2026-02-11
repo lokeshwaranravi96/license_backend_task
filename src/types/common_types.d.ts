@@ -6,4 +6,5 @@ export interface CommonGetOptions extends GeneralOptions {
   limit: number;
   sort_by?: "ASC" | "DESC" | "asc" | "desc";
   status_id?: boolean;
+  id?: string;
 }
