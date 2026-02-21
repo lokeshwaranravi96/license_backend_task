@@ -10,7 +10,7 @@ const swaggerPlugin: FastifyPluginCallback<SwaggerOptions> = async (
   fastify.register(swagger, {
     swagger: {
       info: {
-        title: "Crayond Fastify AviatorX",
+        title: "License task",
         description: "API documentation",
         version: "1.0.0",
       },
